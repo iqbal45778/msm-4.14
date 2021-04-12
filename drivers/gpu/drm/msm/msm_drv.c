@@ -820,7 +820,7 @@ static int msm_drm_init(struct device *dev, struct drm_driver *drv)
 		/* Only pin actual display thread to big cluster */
 		if (i == 0) {
 			priv->disp_thread[i].thread =
-				kthread_run_perf_critical(cpu_perf_mask,
+				kthread_run_perf_critical(cpu_perf_drm_mask,
 					kthread_worker_fn,
 					&priv->disp_thread[i].worker,
 					"crtc_commit:%d", priv->disp_thread[i].crtc_id);
@@ -851,7 +851,7 @@ static int msm_drm_init(struct device *dev, struct drm_driver *drv)
 		/* Only pin first event thread to big cluster */
 		if (i == 0) {
 			priv->event_thread[i].thread =
-				kthread_run_perf_critical(cpu_perf_mask,
+				kthread_run_perf_critical(cpu_perf_drm_mask,
 					kthread_worker_fn,
 					&priv->event_thread[i].worker,
 					"crtc_event:%d", priv->event_thread[i].crtc_id);
@@ -907,7 +907,7 @@ static int msm_drm_init(struct device *dev, struct drm_driver *drv)
 	 * other important events.
 	 */
 	kthread_init_worker(&priv->pp_event_worker);
-	priv->pp_event_thread = kthread_run_perf_critical(cpu_perf_mask,
+	priv->pp_event_thread = kthread_run_perf_critical(cpu_perf_drm_mask,
 			kthread_worker_fn, &priv->pp_event_worker, "pp_event");
 	kthread_init_work(&priv->thread_priority_work, msm_drm_display_thread_priority_worker);
 	kthread_queue_work(&priv->pp_event_worker, &priv->thread_priority_work);
@@ -934,7 +934,7 @@ static int msm_drm_init(struct device *dev, struct drm_driver *drv)
 			goto fail;
 		}
 	}
-	irq_set_perf_affinity(platform_get_irq(pdev, 0), IRQF_PERF_AFFINE);
+	irq_set_perf_affinity(platform_get_irq(pdev, 0), IRQF_PERF_DRM_AFFINE);
 
 	ret = drm_dev_register(ddev, 0);
 	if (ret)
