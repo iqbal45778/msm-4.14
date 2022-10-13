@@ -2,6 +2,8 @@ ccflags-y := -Iinclude/linux
 ccflags-y += -Ofast
 ccflags-y += -mllvm -inline-threshold=15000
 ccflags-y += -mllvm -inlinehint-threshold=10000
+ccflags-y += $(call cc-option, -funroll-loops,)
+ccflags-y += $(call cc-option, -Ofast,)
 
 msm_kgsl_core-y = \
 	kgsl.o \
