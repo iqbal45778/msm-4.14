@@ -1,0 +1,21 @@
+version: 2.1
+jobs:
+  compile:
+   docker:
+      - image: ghcr.io/neutron-toolchains/docker-image:arch-neutron
+   steps:
+      - run:
+          no_output_timeout: 50m
+          command: |
+           git clone https://github.com/iqbal45778/msm-4.14 kernel 
+           cd kernel
+           git clone https://github.com/PREDATOR-project/myscripts.git -b master
+           chmod +x myscripts/clang-setup.sh
+           chmod +x myscripts/surya.sh
+           source ./myscripts/clang-setup.sh
+           ./myscripts/surya.sh
+workflows:
+  version: 2.1
+  cooking:
+    jobs:
+      - compile
