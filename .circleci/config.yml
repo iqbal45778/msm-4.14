@@ -2,11 +2,14 @@ version: 2.1
 jobs:
   compile:
    docker:
-      - image: ghcr.io/neutron-toolchains/docker-image:arch-neutron
+      - image: ubuntu:20.04
+   resource_class: xlarge
    steps:
       - run:
           no_output_timeout: 50m
           command: |
+           apt-get -y update && apt-get -y upgrade && DEBIAN_FRONTEND=noninteractive apt-get -y install bc build-essential bison flex zip gcc clang libc6 curl libstdc++6 git wget libssl-dev zstd openjdk-11-jdk openjdk-11-jre && apt-get -y install python
+           git clone https://github.com/ini23/android_kernel_xiaomi_sdm660_southwest -b 11.0-eas-wifi-r kernel
            git clone https://github.com/iqbal45778/msm-4.14 kernel 
            cd kernel
            git clone https://github.com/PREDATOR-project/myscripts.git -b master
