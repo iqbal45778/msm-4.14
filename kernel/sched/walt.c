@@ -118,8 +118,8 @@ static void release_rq_locks_irqrestore(const cpumask_t *cpus,
  */
 #define MIN_SCHED_RAVG_WINDOW (3333333 * 6)
 #else
-/* Min window size (in ns) = 20ms */
-#define MIN_SCHED_RAVG_WINDOW 20000000
+/* Min window size (in ns) = 8ms */
+#define MIN_SCHED_RAVG_WINDOW 8000000
 #endif
 
 /* Max window size (in ns) = 1s */
