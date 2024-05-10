@@ -167,7 +167,6 @@ static int ashmem_file_setup(struct ashmem_area *asma, size_t size,
 	if (IS_ERR(vmfile))
 		return PTR_ERR(vmfile);
 
-<<<<<<< HEAD
 	/*
 	 * override mmap operation of the vmfile so that it can't be
 	 * remapped which would lead to creation of a new vma with no
