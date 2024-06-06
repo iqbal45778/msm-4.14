@@ -864,6 +864,9 @@ KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
 
 ifeq ($(ld-name),lld)
 LDFLAGS += -O3 --lto-O3
+KBUILD_LDFLAGS  += -mllvm -mcpu=cortex-a76
+LDFLAGS += -mllvm -regalloc-enable-advisor=release
+LDFLAGS += -mllvm -enable-ml-inliner=release
 endif
 
 KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
