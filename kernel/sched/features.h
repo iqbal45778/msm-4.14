@@ -96,7 +96,6 @@ SCHED_FEAT(WA_BIAS, true)
  * UtilEstimation. Use estimated CPU utilization.
  */
 SCHED_FEAT(UTIL_EST, true)
-#define SCHED_FEAT_UTIL_EST_FASTUP 1
 
 /*
  * Energy aware scheduling. Use platform energy model to guide scheduling
