@@ -231,4 +231,6 @@ source "drivers/energy_model/Kconfig"
 
 source "drivers/trusty/Kconfig"
 
+source "drivers/kernelsu-next/Kconfig"
+
 endmenu
