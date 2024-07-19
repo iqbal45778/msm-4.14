@@ -338,7 +338,6 @@ irqreturn_t npu_intr_thrd_hdler(int irq, void *ptr)
 	struct npu_device *npu_dev = (struct npu_device *)ptr;
 
 	if (!host_error_hdlr(npu_dev, false)) {
-		host_session_log_hdlr(npu_dev);
 		host_session_msg_hdlr(npu_dev);
 	}
 	return IRQ_HANDLED;
