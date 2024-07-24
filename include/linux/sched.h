@@ -794,7 +794,6 @@ struct task_struct {
 	u64 cpu_cycles;
 	bool misfit;
 #endif
-	bool low_latency;
 
 #ifdef CONFIG_CGROUP_SCHED
 	struct task_group		*sched_task_group;

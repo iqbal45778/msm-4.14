@@ -1623,58 +1623,6 @@ static const struct file_operations proc_pid_sched_group_id_operations = {
 
 #endif	/* CONFIG_SCHED_WALT */
 
-static int sched_low_latency_show(struct seq_file *m, void *v)
-{
-	struct inode *inode = m->private;
-	struct task_struct *p;
-	bool low_latency;
-
-	p = get_proc_task(inode);
-	if (!p)
-		return -ESRCH;
-
-	low_latency = p->low_latency;
-	seq_printf(m, "%d\n", low_latency);
-
-	put_task_struct(p);
-
-	return 0;
-}
-
-static ssize_t
-sched_low_latency_write(struct file *file, const char __user *buf,
-	    size_t count, loff_t *offset)
-{
-	struct task_struct *p = get_proc_task(file_inode(file));
-	bool low_latency;
-	int err;
-
-	if (!p)
-		return -ESRCH;
-
-	err =  kstrtobool_from_user(buf, count, &low_latency);
-	if (err)
-		goto out;
-
-	p->low_latency = low_latency;
-out:
-	put_task_struct(p);
-	return err < 0 ? err : count;
-}
-
-static int sched_low_latency_open(struct inode *inode, struct file *filp)
-{
-	return single_open(filp, sched_low_latency_show, inode);
-}
-
-static const struct file_operations proc_pid_sched_low_latency_operations = {
-	.open		= sched_low_latency_open,
-	.read		= seq_read,
-	.write		= sched_low_latency_write,
-	.llseek		= seq_lseek,
-	.release	= single_release,
-};
-
 #ifdef CONFIG_SCHED_AUTOGROUP
 /*
  * Print out autogroup related information:
@@ -3223,7 +3171,6 @@ static const struct pid_entry tgid_base_stuff[] = {
 	REG("sched_init_task_load", 00644, proc_pid_sched_init_task_load_operations),
 	REG("sched_group_id", 00666, proc_pid_sched_group_id_operations),
 #endif
-	REG("sched_low_latency", 00666, proc_pid_sched_low_latency_operations),
 #ifdef CONFIG_SCHED_DEBUG
 	REG("sched",      S_IRUGO|S_IWUSR, proc_pid_sched_operations),
 #endif
