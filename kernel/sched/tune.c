@@ -618,8 +618,12 @@ prefer_idle_write(struct cgroup_subsys_state *css, struct cftype *cft,
 	    u64 prefer_idle)
 {
 	struct schedtune *st = css_st(css);
+	int perf_cgroups;
 
-	prefer_idle = (!strcmp(css->cgroup->kn->name, "top-app") || !strcmp(css->cgroup->kn->name, "foreground")) ? 1 : 0;
+	perf_cgroups = (!strcmp(css->cgroup->kn->name, "top-app") ||
+                !strcmp(css->cgroup->kn->name, "foreground"));
+
+	prefer_idle = perf_cgroups ? 1 : 0;
 
 	st->prefer_idle = !!prefer_idle;
 
