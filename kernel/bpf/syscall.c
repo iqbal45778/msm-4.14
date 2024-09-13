@@ -1663,7 +1663,13 @@ static int bpf_prog_query(const union bpf_attr *attr,
 	case BPF_CGROUP_SOCK_OPS:
 		break;
 	default:
+#ifdef CONFIG_ANDROID_SPOOF_KERNEL_VERSION_FOR_BPF
+		pr_err("Pretending to support query for BPF attach_type = %d",
+		       attr->query.attach_type);
+		return 1;
+#else
 		return -EINVAL;
+#endif
 	}
 	cgrp = cgroup_get_from_fd(attr->query.target_fd);
 	if (IS_ERR(cgrp))
