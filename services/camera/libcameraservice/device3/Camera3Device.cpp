@@ -2345,6 +2345,27 @@ status_t Camera3Device::configureStreamsLocked(int operatingMode,
     }
 #endif
 
+#ifdef TAG_NAME
+    sp<VendorTagDescriptor> vTags;
+    sp<VendorTagDescriptorCache> vCache = VendorTagDescriptorCache::getGlobalVendorTagCache();
+    if (vCache.get()) {
+        const camera_metadata_t *metaBuffer = sessionParams.getAndLock();
+        metadata_vendor_id_t vendorId = get_camera_metadata_vendor_id(metaBuffer);
+        sessionParams.unlock(metaBuffer);
+        vCache->getVendorTagDescriptor(vendorId, &vTags);
+        uint32_t tag;
+        if (CameraMetadata::getTagFromName(TAG_NAME, vTags.get(), &tag)) {
+            ALOGE("%s: Unable to get %s tag", __FUNCTION__, TAG_NAME);
+        } else {
+            std::string pkgName = CameraService::getCurrPackageName();
+            status_t res = const_cast<CameraMetadata&>(sessionParams).update(tag, String8(pkgName.c_str()));
+            if (res) {
+                ALOGE("%s: metadata update failed, res = %d", __FUNCTION__, res);
+            }
+        }
+    }
+#endif
+
 #ifdef INCLUDES_MIUI_CAMERA
     {
         sp<VendorTagDescriptor> vTags =
