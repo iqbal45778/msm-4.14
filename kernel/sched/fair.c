@@ -12253,11 +12253,7 @@ static void nohz_idle_balance(struct rq *this_rq, enum cpu_idle_type idle)
 
 	cpumask_andnot(&cpus, nohz.idle_cpus_mask, cpu_isolated_mask);
 
-	/*
-	 * Start with the next CPU after this_cpu so we will end with this_cpu and let a
-	 * chance for other idle cpu to pull load.
-	 */
-	for_each_cpu_wrap(balance_cpu, &cpus, this_cpu+1) {
+	for_each_cpu(balance_cpu, &cpus) {
 		if (!idle_cpu(balance_cpu))
 			continue;
 
