@@ -1324,10 +1324,8 @@ Description:
 return:
 	n.a.
 *******************************************************/
-static void nvt_ts_worker(struct work_struct *work)
+static irqreturn_t nvt_ts_work_func(int irq, void *data)
 {
-	struct nvt_ts_data *ts = container_of(work, struct nvt_ts_data, irq_work);
-
 	int32_t ret = -1;
 	uint8_t point_data[POINT_DATA_LEN + 1 + DUMMY_BYTES] = {0};
 	uint32_t position = 0;
@@ -1348,7 +1346,7 @@ static void nvt_ts_worker(struct work_struct *work)
 		ret = wait_for_completion_timeout(&ts->dev_pm_suspend_completion, msecs_to_jiffies(700));
 		if (!ret) {
 			NVT_ERR("system(spi bus) can't finished resuming procedure, skip it");
-			return;
+			return IRQ_HANDLED;
 		}
 	}
 #endif
@@ -1400,7 +1398,7 @@ static void nvt_ts_worker(struct work_struct *work)
 		//input_id = (uint8_t)(point_data[1] >> 3);
 		nvt_ts_wakeup_gesture_report(input_id, point_data);
 		mutex_unlock(&ts->lock);
-		return;
+		return IRQ_HANDLED;
 	}
 #endif
 	finger_cnt = 0;
@@ -1504,13 +1502,7 @@ static void nvt_ts_worker(struct work_struct *work)
 XFER_ERROR:
 
 	mutex_unlock(&ts->lock);
-	return;
-}
 
-static irqreturn_t nvt_ts_work_func(int irq, void *data)
-{
-	struct nvt_ts_data *ts = data;
-	queue_work(ts->coord_workqueue, &ts->irq_work);
 	return IRQ_HANDLED;
 }
 
@@ -2554,20 +2546,13 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 	}
 #endif
 
-	ts->coord_workqueue = alloc_workqueue("nvt_ts_workqueue", WQ_HIGHPRI, 0);
-	if (!ts->coord_workqueue) {
-		NVT_ERR("create nvt_ts_workqueue fail");
-		ret = -ENOMEM;
-		goto err_create_nvt_ts_workqueue_failed;
-	}
-	INIT_WORK(&ts->irq_work, nvt_ts_worker);
+#if defined(CONFIG_FB)
 	ts->workqueue = create_singlethread_workqueue("nvt_ts_workqueue");
 	if (!ts->workqueue) {
 		NVT_ERR("create nvt_ts_workqueue fail");
 		ret = -ENOMEM;
 		goto err_create_nvt_ts_workqueue_failed;
 	}
-#if defined(CONFIG_FB)
 	INIT_WORK(&ts->resume_work, nvt_ts_resume_work);
 #ifdef _MSM_DRM_NOTIFY_H_
 	ts->drm_notif.notifier_call = nvt_drm_notifier_callback;
@@ -2654,10 +2639,8 @@ err_class_create:
 	class_destroy(ts->nvt_tp_class);
 	ts->nvt_tp_class = NULL;
 
-err_create_nvt_ts_workqueue_failed:
-	if (ts->coord_workqueue)
-		destroy_workqueue(ts->coord_workqueue);
 #if defined(CONFIG_FB)
+err_create_nvt_ts_workqueue_failed:
 	if (ts->workqueue)
 		destroy_workqueue(ts->workqueue);
 #ifdef _MSM_DRM_NOTIFY_H_
@@ -2768,9 +2751,6 @@ return:
 static int32_t nvt_ts_remove(struct spi_device *client)
 {
 	NVT_LOG("Removing driver...\n");
-
-	if (ts->coord_workqueue)
-		destroy_workqueue(ts->coord_workqueue);
 
 #if defined(CONFIG_FB)
 	if (ts->workqueue)
