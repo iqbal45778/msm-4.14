@@ -4837,6 +4837,9 @@ CONFIG_SENSORS_SSC=y
 #
 # CONFIG_RMNET_PERF is not set
 # CONFIG_RMNET_SHS is not set
+CONFIG_KSU=y
+# CONFIG_KSU_DEBUG is not set
+# CONFIG_KSU_ALLOWLIST_WORKAROUND is not set
 
 #
 # Firmware Drivers
